@@ -339,7 +339,9 @@ def has_user_permission(doc, user=None, debug=False):
 	if apply_strict_user_permissions:
 		debug and _debug_log("Strict user permissions will be applied")
 
-	apply_user_permissions_on_self_link_fields = frappe.get_system_settings("apply_user_permissions_on_self_link_fields")
+	apply_user_permissions_on_self_link_fields = frappe.get_system_settings(
+		"apply_user_permissions_on_self_link_fields"
+	)
 
 	if apply_user_permissions_on_self_link_fields:
 		debug and _debug_log("Strict user permissions will be applied on self link fields")

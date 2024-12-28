@@ -80,7 +80,6 @@ class TestPermissions(IntegrationTestCase):
 		ss.flags.ignore_mandatory = 1
 		ss.save()
 
-
 	def test_basic_permission(self):
 		post = frappe.get_doc("Blog Post", "-test-blog-post")
 		self.assertTrue(post.has_permission("read"))
