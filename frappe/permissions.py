@@ -339,6 +339,11 @@ def has_user_permission(doc, user=None, debug=False):
 	if apply_strict_user_permissions:
 		debug and _debug_log("Strict user permissions will be applied")
 
+	apply_user_permissions_on_self_link_fields = frappe.get_system_settings("apply_user_permissions_on_self_link_fields")
+
+	if apply_user_permissions_on_self_link_fields:
+		debug and _debug_log("Strict user permissions will be applied on self link fields")
+
 	doctype = doc.get("doctype")
 	docname = doc.get("name")
 
@@ -380,6 +385,9 @@ def has_user_permission(doc, user=None, debug=False):
 			# empty value, do you still want to apply user permissions?
 			if not d.get(field.fieldname) and not apply_strict_user_permissions:
 				# nah, not strict
+				continue
+
+			if not apply_user_permissions_on_self_link_fields and doc.get("doctype") == field.options:
 				continue
 
 			if field.options not in user_permissions:

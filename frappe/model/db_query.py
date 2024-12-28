@@ -985,8 +985,13 @@ class DatabaseQuery:
 
 		match_filters = {}
 		match_conditions = []
+		apply_user_permissions_on_self_link_fields = frappe.get_system_settings("apply_user_permissions_on_self_link_fields")
+
 		for df in doctype_link_fields:
 			if df.get("ignore_user_permissions"):
+				continue
+
+			if not apply_user_permissions_on_self_link_fields and self.doctype == df.get("options"):
 				continue
 
 			user_permission_values = user_permissions.get(df.get("options"), {})

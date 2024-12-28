@@ -27,6 +27,7 @@
   "rounding_method",
   "permissions",
   "apply_strict_user_permissions",
+  "apply_user_permissions_on_self_link_fields",
   "column_break_21",
   "allow_older_web_view_links",
   "security_tab",
@@ -223,6 +224,13 @@
    "fieldtype": "Check",
    "label": "Apply Strict User Permissions"
   },
+  {
+    "default": "1",
+    "description": "If Apply User Permission on self Link Field is checked and User Permission is defined for a DocType for a User, then user permission is checked Otherwise document is allowed",
+    "fieldname": "apply_user_permissions_on_self_link_fields",
+    "fieldtype": "Check",
+    "label": "Apply User Permissions on self Link Fields"
+   },
   {
    "fieldname": "security",
    "fieldtype": "Section Break"

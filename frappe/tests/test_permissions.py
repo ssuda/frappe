@@ -23,6 +23,7 @@ from frappe.permissions import (
 	update_permission_property,
 )
 from frappe.tests import IntegrationTestCase
+from frappe.tests.test_db_query import create_nested_doctype, create_nested_doctype_records
 from frappe.tests.utils import make_test_records_for_doctype
 from frappe.utils.data import now_datetime
 
@@ -71,6 +72,14 @@ class TestPermissions(IntegrationTestCase):
 		ss.apply_strict_user_permissions = ignore
 		ss.flags.ignore_mandatory = 1
 		ss.save()
+
+	@staticmethod
+	def set_user_permissions_on_self_link_fields(ignore):
+		ss = frappe.get_doc("System Settings")
+		ss.apply_user_permissions_on_self_link_fields = ignore
+		ss.flags.ignore_mandatory = 1
+		ss.save()
+
 
 	def test_basic_permission(self):
 		post = frappe.get_doc("Blog Post", "-test-blog-post")
@@ -422,6 +431,35 @@ class TestPermissions(IntegrationTestCase):
 
 		clear_user_permissions_for_doctype("Salutation")
 		clear_user_permissions_for_doctype("Contact")
+
+	def test_user_permissions_on_self_link_fields(self):
+		"""If `User Permissions on self Link Fields` is checked in System Settings,
+		then apply User Permissions for self linked doctype"""
+
+		frappe.set_user("Administrator")
+		create_nested_doctype()
+		create_nested_doctype_records()
+		add_permission("Nested DocType", "All")
+		add_user_permission("Nested DocType", "Level 3 A", "test3@example.com")
+		self.set_user_permissions_on_self_link_fields(0)
+		self.set_strict_user_permissions(0)
+
+		level_1b = frappe.get_doc("Nested DocType", "Level 1 B")
+		level_3a = frappe.get_doc("Nested DocType", "Level 3 A")
+
+		frappe.set_user("test3@example.com")
+		self.assertFalse(level_1b.has_permission("read"))
+		self.assertTrue(level_3a.has_permission("read"))
+
+		frappe.set_user("Administrator")
+		self.set_user_permissions_on_self_link_fields(1)
+
+		frappe.set_user("test3@example.com")
+		self.assertFalse(level_1b.has_permission("read"))
+		self.assertFalse(level_3a.has_permission("read"))
+
+		frappe.set_user("Administrator")
+		clear_user_permissions_for_doctype("Nested DocType")
 
 	def test_user_permission_is_not_applied_if_user_roles_does_not_have_permission(self):
 		add_user_permission("Blog Post", "-test-blog-post-1", "test3@example.com")
