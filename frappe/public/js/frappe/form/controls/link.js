@@ -184,6 +184,16 @@ frappe.ui.form.ControlLink = class ControlLink extends frappe.ui.form.ControlDat
 			let args = {};
 			this.set_custom_query(args);
 			if (args.filters) {
+				for (const filter in args.filters) {
+					const val = args.filters[filter];
+					if (Array.isArray(val)) {
+						if (val[0] === "=") {
+							args.filters[filter] = val[1];
+						} else {
+							delete args.filters[filter];
+						}
+					}
+				}
 				Object.assign(frappe.route_options, args.filters);
 			}
 		}
